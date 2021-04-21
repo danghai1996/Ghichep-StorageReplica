@@ -1,0 +1,1 @@
+# Ghi chép về Storage Replica trên Windows Server
