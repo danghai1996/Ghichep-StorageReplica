@@ -111,7 +111,7 @@ Sau khi quá trình hoàn tất ta sẽ thấy có thông báo yêu cầu Restar
 
 Restart OS.
 
-## Create reolication partnership
+## Create replication partnership
 Tạo mối quan hệ giữa 2 máy. 
 
 Trên máy WIN-PC01, khởi chạy PowerShell bằng quyền Administrator. Chạy đoạn lệnh sau:
