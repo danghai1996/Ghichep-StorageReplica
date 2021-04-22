@@ -3,8 +3,8 @@
 # Yêu cầu: 
 2 máy cài đặt sẵn HĐH Windows Server 2019 Datacenter Edition
 
-- WIN-PC01: 192.168.10.37/24
-- WIN-PC02: 192.168.10.30/24
+- WIN-PC01: 192.168.10.37/24 - 4 Cores - 4 GB RAM
+- WIN-PC02: 192.168.10.30/24 - 4 Cores - 4 GB RAM
 
 Mỗi máy có 2 phân vùng giống hệt nhau. 1 là nơi Relicate dữ liệu, 2 là nơi lưu Log. 2 ổ sẽ sử dụng Format là GPT và định dạng File System là **ReFS** thay vì **NTFS**.
 
@@ -18,6 +18,10 @@ Máy 2:
 
 # Cấu hình:
 ## Cấu hình Active Directory Domain
+2 máy cần ở chung 1 domain. 
+
+Trong bài lab này, ta set 1 máy làm Domain Controller, máy còn lại sẽ join domain của máy 1.
+
 ### Cấu hình máy win-PC01 làm controller
 <img src = "../images/Screenshot_13.png">
 
@@ -179,7 +183,7 @@ Trên máy WIN-PC01, dữ liệu trên ổ Replica
 
 
 Trên máy WIN-PC02, chạy lệnh để đổi chiều.
-```
+```PowerShell
 Set-SRPartnership -NewSourceComputerName WIN-PC02 -SourceRGName rg02 -DestinationComputerName WIN-PC01 -DestinationRGName rg01
 ```
 
@@ -196,6 +200,23 @@ Sau đó, kiểm tra trên máy 2 sẽ thấy ổ Replica đã có thể truy c�
 Trên máy WIN-PC01 sẽ trở thành máy Destination. Ổ Replica không còn truy cập được nữa:
 
 <img src = "../images/Screenshot_49.png">
+
+## Check Event Log của Storage Replica
+```
+Get-WinEvent -ProviderName Microsoft-Windows-StorageReplica -Max 40
+```
+
+<img src = "../images/Screenshot_52.png">
+
+## Disable Replication and Remove Partnership
+Chạy lần lượt 2 lệnh sau trên PowerShell:
+```
+Get-SRPartnership | Remove-SRPartnership
+
+Get-SRGroup | Remove-SRGroup
+```
+
+
 
 # Tham khảo:
 - https://docs.microsoft.com/en-us/windows-server/storage/storage-replica/server-to-server-storage-replication

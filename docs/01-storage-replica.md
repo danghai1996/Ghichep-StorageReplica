@@ -87,7 +87,10 @@ Kịch bản này sử dụng Storage Spaces với bộ nhớ SAS dùng chung, S
         - Cần phiên bản Windows server 2019 trở lên
         - SR nhân bản 1 volume duy nhất thay vì không giới hạn
         - Giới hạn dung lượng của volume là 2TB thay vì unlimited.
-- 
+
+- Không thể replicate ổ đĩa chứa OS
+
+- Mở các port cho SMB (port 445, và 5445 cho SMB Direct), WS-MAN (Web Services Management - port 5985)
 
 
 
