@@ -6,7 +6,7 @@
 - WIN-PC01: 192.168.10.37/24
 - WIN-PC02: 192.168.10.30/24
 
-Mỗi máy có 2 phân vùng giống hệt nhau. 1 là nơi Relicate dữ liệu, 2 là nơi lưu Log. 2 ổ ở Format ReFS thay vì NTFS.
+Mỗi máy có 2 phân vùng giống hệt nhau. 1 là nơi Relicate dữ liệu, 2 là nơi lưu Log. 2 ổ sẽ sử dụng Format là GPT và định dạng File System là **ReFS** thay vì **NTFS**.
 
 Máy 1:
 
@@ -141,6 +141,12 @@ PSComputerName          :
 ```
 
 <img src = "../images/Screenshot_39.png">
+
+Sau khi cấu hình lần đầu, ta kiểm tra staus sẽ thấy ở trạng thái `InitialBlockCopy`. Sau khi quá trình replication ban đầu hoàn tất, trạng thái sao chép sẽ là `ContinuouslyReplicating`.
+
+<img src = "../images/Screenshot_50.png">
+
+<img src = "../images/Screenshot_51.png">
 
 # Kiểm tra:
 ### Thêm Performance Monitor cho Storage Replica: Thực hiện trên cả 2 máy
