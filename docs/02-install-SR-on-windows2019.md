@@ -6,7 +6,7 @@
 - WIN-PC01: 192.168.10.37/24
 - WIN-PC02: 192.168.10.30/24
 
-Mỗi máy có 2 phân vùng giống hệt nhau. 1 là nơi Relicate dữ liệu, 2 là nơi lưu Log.
+Mỗi máy có 2 phân vùng giống hệt nhau. 1 là nơi Relicate dữ liệu, 2 là nơi lưu Log. 2 ổ ở Format ReFS thay vì NTFS.
 
 Máy 1:
 
@@ -14,34 +14,9 @@ Máy 1:
 
 Máy 2:
 
-<img src = "../images/Screenshot_12.png">
+<img src = "../images/Screenshot_11.png">
 
 # Cấu hình:
-## Cài đặt tính năng Storage Replication trên cả 2 máy
-```
-Enable `NIC Teaming`:
-
-<img src = "../images/Screenshot_4.png">
-```
-
-Enabled Storage Replica:
-
-<img src = "../images/Screenshot_5.png">
-
-<img src = "../images/Screenshot_6.png">
-
-<img src = "../images/Screenshot_7.png">
-
-<img src = "../images/Screenshot_8.png">
-
-<img src = "../images/Screenshot_9.png">
-
-Sau khi quá trình hoàn tất ta sẽ thấy có thông báo yêu cầu Restart OS:
-
-<img src = "../images/Screenshot_10.png">
-
-Restart OS.
-
 ## Cấu hình Active Directory Domain
 ### Cấu hình máy win-PC01 làm controller
 <img src = "../images/Screenshot_13.png">
@@ -111,38 +86,112 @@ Quay lại máy win-PC01, Mở **“Active Directory Users and Computers”** đ
 Ta đã thấy máy vừa join domain.
 <img src = "../images/Screenshot_38.png">
 
+## Cài đặt tính năng Storage Replication trên cả 2 máy
+```
+Enable `NIC Teaming`:
+
+<img src = "../images/Screenshot_4.png">
+```
+
+Enabled Storage Replica:
+
+<img src = "../images/Screenshot_5.png">
+
+<img src = "../images/Screenshot_6.png">
+
+<img src = "../images/Screenshot_7.png">
+
+<img src = "../images/Screenshot_8.png">
+
+<img src = "../images/Screenshot_9.png">
+
+Sau khi quá trình hoàn tất ta sẽ thấy có thông báo yêu cầu Restart OS:
+
+<img src = "../images/Screenshot_10.png">
+
+Restart OS.
+
 ## Create reolication partnership
 Tạo mối quan hệ giữa 2 máy. 
 
 Trên máy WIN-PC01, khởi chạy PowerShell bằng quyền Administrator. Chạy đoạn lệnh sau:
 
 ```powershell
-New-SRPartnership -SourceComputerName WIN-PC01 -SourceRGName Replication01 -SourceVolumeName R: -SourceLogVolumeName L: -DestinationComputerName WIN-PC02 -DestinationRGName Replication02 -DestinationVolumeName R: -DestinationLogVolumeName L: 
+New-SRPartnership -SourceComputerName "WIN-PC01" -SourceRGName rg01 -SourceVolumeName "R:" -SourceLogVolumeName "L:" -DestinationComputerName "WIN-PC02" -DestinationRGName rg02 -DestinationVolumeName "R:" -DestinationLogVolumeName "L:" -LogSizeInBytes 1gb
 ```
 
 **Trong đó:**
 - `-SourceComputerName WIN-PC01` : Tên máy cần replicate dữ liệu (`WIN-PC01`)
-- `-SourceRGName Replication01` : Đặt tên cho Replica Group của máy nguồn (`Replication01`)
+- `-SourceRGName Replication01` : Đặt tên cho Replica Group của máy nguồn (`rg01`)
 - `-SourceVolumeName R:` : Ổ lưu dữ liệu cần replicate trên máy nguồn (`R:\`)
 - `-SourceLogVolumeName L:` : Ổ lưu log trên máy nguồn WIN-PC01 (`L:\`)
 - `-DestinationComputerName WIN-PC02`: Tên máy nhận replicate dữ liệu (`WIN-PC02`)
-- `-DestinationRGName Replication02` : Đặt tên cho Replica Group của máy nhận WIN-PC02(`Replication02`)
+- `-DestinationRGName Replication02` : Đặt tên cho Replica Group của máy nhận WIN-PC02(`rg02`)
 - `-DestinationVolumeName R:` : Ổ lưu dữ liệu cần replicate trên máy nhận WIN-PC02(`R:\`)
 - `-DestinationLogVolumeName L:` : Ổ lưu log trên máy nhận WIN-PC02(`L:\`)
 
 Output:
 ```
 DestinationComputerName : WIN-PC02
-DestinationRGName       : Replication02
+DestinationRGName       : rg02
 Id                      : 5c3249a1-b3ef-4bca-a804-92ba4ea46a35
 SourceComputerName      : WIN-PC01
-SourceRGName            : Replication01
+SourceRGName            : rg01
 PSComputerName          :
 ```
 
 <img src = "../images/Screenshot_39.png">
 
+# Kiểm tra:
+### Thêm Performance Monitor cho Storage Replica: Thực hiện trên cả 2 máy
+Ta sẽ thực hiện thêm giám sát cho tính năng. Khởi chạy PowerShell, gõ lệnh: `PerfMon.msc` để Mở Performance Monitor.
+
+- Chọn Performance Monitor -> Chọn Add:
+
+    <img src = "../images/Screenshot_41.png">
+
+- Tìm đến Storage Replica Statistics -> Add -> OK
+
+    <img src = "../images/Screenshot_42.png">
+
+- Chuyển về dạng Report:
+
+    <img src = "../images/Screenshot_48.png">
+
+- Khi không có dữ liệu đồng bộ, ta sẽ thấy các giá trị bằng 0:
+
+    <img src = "../images/Screenshot_43.png">
+
+- Thử thêm dữ liệu vào ổ Replica trên máy WIN-PC01, ta sẽ thấy các giá trị thay đổi, điều này cho biết việc đồng bộ đang được thực hiện. Khi thực hiện xong thì các giá trị lại trở về 0:
+
+    <img src = "../images/Screenshot_44.png">
+
+### Thử đổi ngược lại chiều đồng bộ kiểm tra dữ liệu trên WIN-PC02
+Trên máy WIN-PC01, dữ liệu trên ổ Replica
+
+<img src = "../images/Screenshot_40.png">
+
+
+Trên máy WIN-PC02, chạy lệnh để đổi chiều.
+```
+Set-SRPartnership -NewSourceComputerName WIN-PC02 -SourceRGName rg02 -DestinationComputerName WIN-PC01 -DestinationRGName rg01
+```
+
+Nhập `Y` để đồng ý:
+
+<img src = "../images/Screenshot_45.png">
+
+Sau đó, kiểm tra trên máy 2 sẽ thấy ổ Replica đã có thể truy cập. Dữ liệu trong ổ đầy đủ:
+
+<img src = "../images/Screenshot_46.png">
+
+<img src = "../images/Screenshot_47.png">
+
+Trên máy WIN-PC01 sẽ trở thành máy Destination. Ổ Replica không còn truy cập được nữa:
+
+<img src = "../images/Screenshot_49.png">
 
 # Tham khảo:
 - https://docs.microsoft.com/en-us/windows-server/storage/storage-replica/server-to-server-storage-replication
 - https://nedimmehic.org/2017/02/22/configure-storage-replication-server-to-server/
+- https://robertsmit.wordpress.com/2018/10/30/step-by-step-server-to-server-storage-replication-with-windows-server-2019-storage-replica-windowsadmincenter-storagereplica-windowsserver2019-refs-sr-azure/
