@@ -91,12 +91,6 @@ Ta đã thấy máy vừa join domain.
 <img src = "../images/Screenshot_38.png">
 
 ## Cài đặt tính năng Storage Replication trên cả 2 máy
-```
-Enable `NIC Teaming`:
-
-<img src = "../images/Screenshot_4.png">
-```
-
 Enabled Storage Replica:
 
 <img src = "../images/Screenshot_5.png">
@@ -114,6 +108,16 @@ Sau khi quá trình hoàn tất ta sẽ thấy có thông báo yêu cầu Restar
 <img src = "../images/Screenshot_10.png">
 
 Restart OS.
+
+## Chạy Test:
+Chạy lệnh Test để kiểm tra điều kiện 2 máy có đáp ứng không
+```powershell
+Test-SRTopology -SourceComputerName “WIN-PC01” -SourceVolumeName “r:” -SourceLogVolumeName “l:” -DestinationComputerName “WIN-PC02” -DestinationVolumeName “r:” -DestinationLogVolumeName “l:” -DurationInMinutes 10 -ResultPath c:\Temp
+```
+
+Đợi quá trình thực hiện xong. Mở file report xem kết quả:
+
+<img src = "../images/Screenshot_76.png">
 
 ## Create replication partnership
 Tạo mối quan hệ giữa 2 máy. 
@@ -215,8 +219,6 @@ Get-SRPartnership | Remove-SRPartnership
 
 Get-SRGroup | Remove-SRGroup
 ```
-
-
 
 # Tham khảo:
 - https://docs.microsoft.com/en-us/windows-server/storage/storage-replica/server-to-server-storage-replication
